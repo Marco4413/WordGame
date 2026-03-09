@@ -1,0 +1,159 @@
+/* MIT Copyright (c) 2026 [Marco4413](https://github.com/Marco4413/WordGame) */
+
+@import url('https://Marco4413.github.io/static/css/dark.css');
+
+:root {
+    --char-correct-background:     #008000;
+    --char-wrong-place-background: #a16300;
+    --char-not-found-background:   #484848;
+}
+
+body {
+    margin: 0px;
+    height: 100vh;
+    align-content: center;
+}
+
+.button, button, input,
+.keyboard-char,
+.keyboard-key,
+.board-item {
+    font-size: 10pt;
+}
+
+.keyboard-key-down {
+    translate: 0 0.2em;
+}
+
+#word-game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.keyboard,
+.board {
+    width: fit-content;
+    margin: 0.5em;
+}
+
+.keyboard-row,
+.board-row {
+    display: flex;
+}
+
+.keyboard-row {
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.keyboard-char,
+.keyboard-key,
+.board-item {
+    border: 0.1em solid transparent;
+    border-color: var(--background-color-dark);
+    border-radius: 1em;
+    /* margin: -0.05em; */
+
+    width: 2em;
+    height: 2em;
+    text-align: center;
+    align-content: center;
+    /* margin: 0.1em; */
+}
+
+.keyboard-char,
+.keyboard-key {
+    cursor: pointer;
+    user-select: none;
+}
+
+.keyboard-key {
+    width: fit-content;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.keyboard-char.char-not-found {
+    visibility: hidden;
+}
+
+@keyframes a-flip-card {
+    0% {
+        rotate: y 0deg;
+        background-color: transparent;
+    }
+    50% {
+        rotate: y 90deg;
+        background-color: transparent;
+    }
+    50.1% {
+        rotate: y 270deg;
+        background-color: var(--a-flip-card-background-color);
+    }
+    100% {
+        rotate: y 360deg;
+        background-color: var(--a-flip-card-background-color);
+    }
+}
+
+@keyframes a-flip-card-full {
+    0% {
+        rotate: y 0deg;
+        background-color: transparent;
+    }
+    25% {
+        color: var(--a-flip-card-color);
+        rotate: y 90deg;
+        background-color: transparent;
+    }
+    25.01%, 74.99% {
+        color: transparent;
+        background-color: transparent;
+    }
+    75% {
+        color: var(--a-flip-card-color);
+        rotate: y 270deg;
+        background-color: var(--a-flip-card-background-color);
+    }
+    100% {
+        rotate: y 360deg;
+        background-color: var(--a-flip-card-background-color);
+    }
+}
+
+.char-correct,
+.char-wrong-place,
+.char-not-found {
+    --a-flip-card-color: var(--text-color-dark);
+    animation: a-flip-card 0.5s ease-out;
+}
+
+.char-correct {
+    --a-flip-card-background-color: var(--char-correct-background);
+    background-color: var(--char-correct-background);
+}
+
+.char-wrong-place {
+    --a-flip-card-background-color: var(--char-wrong-place-background);
+    background-color: var(--char-wrong-place-background);
+}
+
+.char-not-found {
+    --a-flip-card-background-color: var(--char-not-found-background);
+    background-color: var(--char-not-found-background);
+}
+
+@media only screen and (min-width: 768px) {
+    .button, button, input,
+    .keyboard-char,
+    .keyboard-key,
+    .board-item {
+        font-size: 20pt;
+    }
+
+    .keyboard-char,
+    .keyboard-key {
+        margin: 2.5px;
+    }
+}
