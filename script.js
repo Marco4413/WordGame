@@ -222,7 +222,9 @@ class BoardRow {
             const wordCharIndex = wordChars.findIndex(char => (char === content[i]));
             if (wordCharIndex >= 0) {
                 wordChars[wordCharIndex] = "";
-                charStates[i] = CharState.WrongPlace;
+                if (charStates[i] === CharState.NotFound) {
+                    charStates[i] = CharState.WrongPlace;
+                }
             }
         }
 
