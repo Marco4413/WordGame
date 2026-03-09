@@ -229,7 +229,7 @@ class BoardRow {
         return charStates;
     }
 
-    verifyString() {
+    verifyContent() {
         let correct = true;
         const charStates = this.getContentCharStates();
         for (let i = 0; i < charStates.length; ++i) {
@@ -355,7 +355,7 @@ class Board {
         case "Enter":
             if (activeRow.isFilled) {
                 ++this.#activeRowIndex;
-                const isCorrect = activeRow.verifyString();
+                const isCorrect = activeRow.verifyContent();
                 if (isCorrect || this.#activeRowIndex >= this.#rows.length) {
                     this.#isGameOver = true;
                 }
