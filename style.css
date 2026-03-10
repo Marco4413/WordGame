@@ -98,31 +98,6 @@ body {
     }
 }
 
-@keyframes a-flip-card-full {
-    0% {
-        rotate: y 0deg;
-        background-color: transparent;
-    }
-    25% {
-        color: var(--a-flip-card-color);
-        rotate: y 90deg;
-        background-color: transparent;
-    }
-    25.01%, 74.99% {
-        color: transparent;
-        background-color: transparent;
-    }
-    75% {
-        color: var(--a-flip-card-color);
-        rotate: y 270deg;
-        background-color: var(--a-flip-card-background-color);
-    }
-    100% {
-        rotate: y 360deg;
-        background-color: var(--a-flip-card-background-color);
-    }
-}
-
 .char-correct,
 .char-wrong-place,
 .char-not-found {
