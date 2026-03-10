@@ -14,6 +14,7 @@ body {
     align-content: center;
 }
 
+#answer,
 .button, button, input,
 .keyboard-char,
 .keyboard-key,
@@ -145,6 +146,7 @@ body {
 }
 
 @media only screen and (min-width: 768px) {
+    #answer,
     .button, button, input,
     .keyboard-char,
     .keyboard-key,

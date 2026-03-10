@@ -408,6 +408,8 @@ window.addEventListener("load", () => {
         const keyboard = new Keyboard();
 
         const board = new Board(initWord, undefined, keyboard);
+        const $answer = document.getElementById("answer");
+
         window.__board = board;
         window.addEventListener("keyup", ev => {
             keyboard.setKeyUp(ev.key);
@@ -415,6 +417,9 @@ window.addEventListener("load", () => {
         window.addEventListener("keydown", ev => {
             keyboard.setKeyDown(ev.key);
             if (board.handleKeyDown(ev.key)) {
+                if (board.isGameOver) {
+                    $answer.innerText = `'${board.word}'`;
+                }
                 ev.preventDefault();
             }
         });
@@ -436,6 +441,7 @@ window.addEventListener("load", () => {
         $newWord.addEventListener("click", () => {
             const word = wordsList[Math.floor(Math.random() * wordsList.length)];
             board.setWord(word);
+            $answer.innerText = "";
         });
     })
 });
