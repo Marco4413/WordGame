@@ -26,6 +26,10 @@ body {
     translate: 0 0.2em;
 }
 
+.keyboard-key-touch {
+    background-color: var(--background-color-dark);
+}
+
 #word-game {
     display: flex;
     flex-direction: column;

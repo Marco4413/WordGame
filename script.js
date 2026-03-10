@@ -39,11 +39,16 @@ class Keyboard {
 
     /** @param {string[]} layout */
     #createKeyboard(layout) {
-        const onKeyPress = (key) => {
-            if (this.#onKeyPress != null) {
-                this.#onKeyPress(key);
-            }
-        };
+        const setupKeyListeners = ($key, key) => {
+            $key.addEventListener("pointerdown",  ev => ev.target.classList.add("keyboard-key-touch"));
+            $key.addEventListener("pointerleave", ev => ev.target.classList.remove("keyboard-key-touch"));
+            $key.addEventListener("pointerup",    ev => ev.target.classList.remove("keyboard-key-touch"));
+            $key.addEventListener("click", () => {
+                if (this.#onKeyPress != null) {
+                    this.#onKeyPress(key);
+                }
+            });
+        }
 
         const charMap = {};
         const $keyboard = document.createElement("div");
@@ -58,9 +63,7 @@ class Keyboard {
                 charMap[char] = $char;
                 $keyRow.appendChild($char);
 
-                $char.addEventListener("click", () => {
-                    onKeyPress(char);
-                });
+                setupKeyListeners($char, char);
             }
             $keyboard.appendChild($keyRow);
         }
@@ -82,12 +85,8 @@ class Keyboard {
         $keyboard.children.item(backspaceIndex)
                 .appendChild($backspace);
 
-        $enter.addEventListener("click", () => {
-            onKeyPress("Enter");
-        });
-        $backspace.addEventListener("click", () => {
-            onKeyPress("Backspace");
-        });
+        setupKeyListeners($enter, "Enter");
+        setupKeyListeners($backspace, "Backspace");
 
         this.#$domElement = $keyboard;
         this.#charMap = charMap;
@@ -109,6 +108,7 @@ class Keyboard {
         const $key = this.#charMap[key.toUpperCase()] ?? this.#keyMap[key];
         if ($key == null) return;
         $key.classList.add("keyboard-key-down");
+        $key.classList.add("keyboard-key-touch");
     }
 
     /**
@@ -119,6 +119,7 @@ class Keyboard {
         const $key = this.#charMap[key.toUpperCase()] ?? this.#keyMap[key];
         if ($key == null) return;
         $key.classList.remove("keyboard-key-down");
+        $key.classList.remove("keyboard-key-touch");
     }
 
     /** @param {Record<string, CharState>} charStateMap */
