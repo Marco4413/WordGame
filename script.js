@@ -181,14 +181,14 @@ class BoardRow {
         this.#$domElement = $row;
     }
 
-    handleBackspace() {
+    deleteLastChar() {
         if (this.#currentCharIndex <= 0) return;
         --this.#currentCharIndex;
         const $char = this.#$domElement.children.item(this.#currentCharIndex);
         $char.innerText = "";
     }
 
-    handleCharInput(char) {
+    inputChar(char) {
         if (this.#currentCharIndex >= this.#word.length) return;
         const $char = this.#$domElement.children.item(this.#currentCharIndex);
         $char.innerText = char;
@@ -201,6 +201,13 @@ class BoardRow {
             content += $el.innerText;
         }
         return content;
+    }
+
+    clearContent() {
+        this.#currentCharIndex = 0;
+        for (const $char of this.#$domElement.children) {
+            $char.innerText = "";
+        }
     }
 
     /** @returns {CharState[]} */
@@ -371,11 +378,14 @@ class Board {
             }
             return true;
         case "Backspace":
-            activeRow.handleBackspace();
+            activeRow.deleteLastChar();
+            return true;
+        case "Delete":
+            activeRow.clearContent();
             return true;
         default:
             if (key.match(/^[a-z]$/gi) != null) {
-                activeRow.handleCharInput(key.toUpperCase());
+                activeRow.inputChar(key.toUpperCase());
                 return true;
             }
         }
