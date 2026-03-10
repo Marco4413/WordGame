@@ -349,9 +349,12 @@ class Board {
         return charStates;
     }
 
-    /** @param {string} key */
-    handleKeyPress(key) {
-        if (this.#isGameOver) return;
+    /**
+     * @param {string} key
+     * @returns {boolean} true if `key` was handled
+     */
+    handleKeyDown(key) {
+        if (this.#isGameOver) return false;
         const activeRow = this.#rows[this.#activeRowIndex];
         switch (key) {
         case "Enter":
@@ -366,26 +369,17 @@ class Board {
                     this.#keyboard.setCharStates(this.getCharStates());
                 }
             }
-            break;
+            return true;
         case "Backspace":
             activeRow.handleBackspace();
-            break;
+            return true;
         default:
             if (key.match(/^[a-z]$/gi) != null) {
                 activeRow.handleCharInput(key.toUpperCase());
+                return true;
             }
         }
-    }
-
-    /** @param {string} key */
-    handleKeyDown(key) {
-        if (this.#isGameOver) return;
-        const activeRow = this.#rows[this.#activeRowIndex];
-        switch (key) {
-        case "Backspace":
-            activeRow.handleBackspace();
-            break;
-        }
+        return false;
     }
 
     get word() { return this.#word; }
@@ -405,21 +399,17 @@ window.addEventListener("load", () => {
 
         const board = new Board(initWord, undefined, keyboard);
         window.__board = board;
-        window.addEventListener("keypress", ev => board.handleKeyPress(ev.key));
         window.addEventListener("keyup", ev => {
             keyboard.setKeyUp(ev.key);
         });
         window.addEventListener("keydown", ev => {
             keyboard.setKeyDown(ev.key);
-            if (ev.key === "Delete") {
-                const word = wordsList[Math.floor(Math.random() * wordsList.length)];
-                board.setWord(word);
-            } else {
-                board.handleKeyDown(ev.key);
+            if (board.handleKeyDown(ev.key)) {
+                ev.preventDefault();
             }
         });
 
-        keyboard.setKeyPressListener(key => board.handleKeyPress(key));
+        keyboard.setKeyPressListener(key => board.handleKeyDown(key));
 
         const $board = document.getElementById("board");
         $board.replaceWith(board.$domElement);
