@@ -95,7 +95,7 @@ class Keyboard {
     }
 
     /**
-     * @param {(key: string) => void} listener
+     * @param {(key: string) => any} listener
      */
     setKeyPressListener(listener) {
         this.#onKeyPress = listener;
