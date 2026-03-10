@@ -420,7 +420,6 @@ window.addEventListener("load", () => {
                 if (board.isGameOver) {
                     $answer.innerText = `'${board.word}'`;
                 }
-                ev.preventDefault();
             }
         });
 
@@ -433,15 +432,17 @@ window.addEventListener("load", () => {
         $keyboard.replaceWith(keyboard.$domElement);
 
         const $share = document.getElementById("share");
-        $share.addEventListener("click", () => {
+        $share.addEventListener("click", ev => {
             navigator.clipboard.writeText(board.getShareableString());
+            ev.target.blur();
         });
 
         const $newWord = document.getElementById("new-word");
-        $newWord.addEventListener("click", () => {
+        $newWord.addEventListener("click", ev => {
             const word = wordsList[Math.floor(Math.random() * wordsList.length)];
             board.setWord(word);
             $answer.innerText = "";
+            ev.target.blur();
         });
     })
 });
