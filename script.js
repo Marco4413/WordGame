@@ -7,6 +7,12 @@ const CharState = Object.freeze({
     NotFound:   2,
 });
 
+/** @enum {number} */
+const MessageKind = Object.freeze({
+    Info:  0,
+    Error: 1,
+});
+
 class Keyboard {
     #$domElement;
     /** @type {Record<string, HTMLElement>} */
@@ -297,6 +303,8 @@ class Board {
     /** @type {Keyboard?} */
     #keyboard;
 
+    #onMessage;
+
     /**
      * @param {string} word
      * @param {number} [attempts]
@@ -308,6 +316,19 @@ class Board {
         this.#$domElement = $board;
         this.setWord(word, attempts);
         this.#keyboard = keyboard ?? null;
+    }
+
+    #sendMessage(kind, message) {
+        if (this.#onMessage != null) {
+            this.#onMessage(kind, message);
+        }
+    }
+
+    /**
+     * @param {(kind: MessageKind, message: string) => any} listener
+     */
+    setMessageListener(listener) {
+        this.#onMessage = listener;
     }
 
     /**
@@ -370,6 +391,7 @@ class Board {
                 ++this.#activeRowIndex;
                 const isCorrect = activeRow.verifyContent();
                 if (isCorrect || this.#activeRowIndex >= this.#rows.length) {
+                    this.#sendMessage(MessageKind.Info, `'${this.word}'`);
                     this.#isGameOver = true;
                 }
 
@@ -409,7 +431,33 @@ window.addEventListener("load", () => {
         const keyboard = new Keyboard();
 
         const board = new Board(initWord, undefined, keyboard);
-        const $answer = document.getElementById("answer");
+
+        const $message = document.getElementById("message");
+        let lastMessageTimeout;
+        const clearMessage = () => {
+            clearTimeout(lastMessageTimeout);
+            lastMessageTimeout = undefined;
+            $message.innerText = "";
+        };
+        const sendMessage = (message, timeout) => {
+            clearMessage();
+            $message.innerText = message;
+            if (timeout != null) {
+                lastMessageTimeout = setTimeout(() => {
+                    clearMessage();
+                }, timeout)
+            }
+        };
+        board.setMessageListener((kind, message) => {
+            switch (kind) {
+            case MessageKind.Error:
+                sendMessage(message, 2500);
+                break;
+            case MessageKind.Info:
+            default:
+                sendMessage(message);
+            }
+        });
 
         window.__board = board;
         window.addEventListener("keyup", ev => {
@@ -417,11 +465,7 @@ window.addEventListener("load", () => {
         });
         window.addEventListener("keydown", ev => {
             keyboard.setKeyDown(ev.key);
-            if (board.handleKeyDown(ev.key)) {
-                if (board.isGameOver) {
-                    $answer.innerText = `'${board.word}'`;
-                }
-            }
+            board.handleKeyDown(ev.key);
         });
 
         keyboard.setKeyPressListener(key => board.handleKeyDown(key));
@@ -442,7 +486,7 @@ window.addEventListener("load", () => {
         $newWord.addEventListener("click", ev => {
             const word = wordsList[Math.floor(Math.random() * wordsList.length)];
             board.setWord(word);
-            $answer.innerText = "";
+            clearMessage();
             ev.target.blur();
         });
     })

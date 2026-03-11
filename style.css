@@ -14,7 +14,11 @@ body {
     align-content: center;
 }
 
-#answer,
+#message {
+    min-height: 1lh;
+}
+
+#message,
 .button, button, input,
 .keyboard-char,
 .keyboard-key,
@@ -125,7 +129,7 @@ body {
 }
 
 @media only screen and (min-width: 768px) {
-    #answer,
+    #message,
     .button, button, input,
     .keyboard-char,
     .keyboard-key,
