@@ -302,20 +302,24 @@ class Board {
 
     /** @type {Keyboard?} */
     #keyboard;
+    /** @type {Set<string>?} */
+    #dictionary;
 
     #onMessage;
 
     /**
      * @param {string} word
      * @param {number} [attempts]
-     * @param {Keyboard} [keyboard]
+     * @param {Keyboard?} [keyboard]
+     * @param {Set<string>?} [dictionary] A set of valid words
      */
-    constructor(word, attempts, keyboard) {
+    constructor(word, attempts, keyboard, dictionary) {
         const $board = document.createElement("div");
         $board.classList.add("board");
         this.#$domElement = $board;
         this.setWord(word, attempts);
         this.#keyboard = keyboard ?? null;
+        this.#dictionary = dictionary ?? null;
     }
 
     #sendMessage(kind, message) {
@@ -336,6 +340,10 @@ class Board {
      * @param {number} [attempts]
      */
     setWord(word, attempts) {
+        if (!this.isWordInDictionary(word)) {
+            throw new Error(`'${word}' is not within the dictionary of this`);
+        }
+
         attempts ??= word.length + 1;
 
         this.#word = word.toUpperCase();
@@ -354,6 +362,11 @@ class Board {
         if (this.#keyboard != null) {
             this.#keyboard.clearCharStates();
         }
+    }
+
+    isWordInDictionary(word) {
+        if (this.#dictionary == null) return true;
+        return this.#dictionary.has(word);
     }
 
     getShareableString() {
@@ -388,15 +401,20 @@ class Board {
         switch (key) {
         case "Enter":
             if (activeRow.isFilled) {
-                ++this.#activeRowIndex;
-                const isCorrect = activeRow.verifyContent();
-                if (isCorrect || this.#activeRowIndex >= this.#rows.length) {
-                    this.#sendMessage(MessageKind.Info, `'${this.word}'`);
-                    this.#isGameOver = true;
-                }
-
-                if (this.#keyboard != null) {
-                    this.#keyboard.setCharStates(this.getCharStates());
+                const content = activeRow.getContent();
+                if (this.isWordInDictionary(content)) {
+                    ++this.#activeRowIndex;
+                    const isCorrect = activeRow.verifyContent();
+                    if (isCorrect || this.#activeRowIndex >= this.#rows.length) {
+                        this.#sendMessage(MessageKind.Info, `'${this.word}'`);
+                        this.#isGameOver = true;
+                    }
+    
+                    if (this.#keyboard != null) {
+                        this.#keyboard.setCharStates(this.getCharStates());
+                    }
+                } else {
+                    this.#sendMessage(MessageKind.Error, `'${content}' is invalid`)
                 }
             }
             return true;
@@ -422,15 +440,55 @@ class Board {
     get isGameOver() { return this.#isGameOver; }
 }
 
-window.addEventListener("load", () => {
+/**
+ * @param {number} minLength
+ * @param {number} [maxLength] Same as `minLength` if `undefined`
+ * @returns {Promise<Set<string>?>} A set of upper-case words with length [minLength; maxLength]
+ */
+async function getDictionary(minLength, maxLength) {
+    maxLength ??= minLength;
+    // https://github.com/meetDeveloper/freeDictionaryAPI
+    const resp = await fetch("https://raw.githubusercontent.com/meetDeveloper/freeDictionaryAPI/refs/heads/master/meta/wordList/english.txt");
+    if (!resp.ok) return null;
+    const dict = await resp.text();
+    return new Set(
+            dict.split("\n")
+                .filter(word => (minLength <= word.length && word.length <= maxLength))
+                .map(word => word.toUpperCase())
+        );
+}
+
+/**
+ * @returns {Promise<[ string[], number, number ]>} A list of upper-case words, the min and max length of the words
+ */
+async function getWords() {
     // https://www.fiveforks.com/wordle/block/
-    fetch("./words.txt").then(resp => resp.text()).then(words => {
-        const wordsList = words.split(/\s+/g);
-        const initWord  = wordsList[Math.floor(Math.random() * wordsList.length)];
+    const resp  = await fetch("./words.txt");
+    const words = await resp.text();
+    const wordsList = words.split(/\s+/g);
+
+    let minWordLength = Number.MAX_SAFE_INTEGER;
+    let maxWordLength = 0;
+    for (const word of wordsList) {
+        if (word.length < minWordLength) minWordLength = word.length;
+        if (word.length > maxWordLength) maxWordLength = word.length;
+    }
+
+    return [ wordsList, minWordLength, maxWordLength ];
+}
+
+window.addEventListener("load", async () => {
+    { // Scope kept to reduce git diff
+        const [ wordsList, minWordLength, maxWordLength ] = await getWords();
+        const wordsDict = await getDictionary(minWordLength, maxWordLength);
+        if (wordsDict != null) {
+            wordsList.forEach(word => wordsDict.add(word));
+        }
 
         const keyboard = new Keyboard();
 
-        const board = new Board(initWord, undefined, keyboard);
+        const initWord = wordsList[Math.floor(Math.random() * wordsList.length)];
+        const board = new Board(initWord, undefined, keyboard, wordsDict);
 
         const $message = document.getElementById("message");
         let lastMessageTimeout;
@@ -489,5 +547,5 @@ window.addEventListener("load", () => {
             clearMessage();
             ev.target.blur();
         });
-    })
+    }
 });
