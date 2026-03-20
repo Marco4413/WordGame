@@ -75,6 +75,10 @@ body {
 .keyboard-key {
     cursor: pointer;
     user-select: none;
+    /* https://stackoverflow.com/questions/13620670/prevent-clickable-div-from-being-highlighted-in-android-webview
+       https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/-webkit-tap-highlight-color
+     */
+    -webkit-tap-highlight-color: transparent;
 }
 
 .keyboard-key {
