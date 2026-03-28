@@ -1,17 +1,23 @@
 /* MIT Copyright (c) 2026 [Marco4413](https://github.com/Marco4413/WordGame) */
 
-@import url('https://Marco4413.github.io/static/css/dark.css');
-
 :root {
-    --char-correct-background:     #008000;
-    --char-wrong-place-background: #a16300;
-    --char-not-found-background:   #484848;
+    --color-scheme-darkness:  calc(100% * (1 - var(--color-scheme)));
+    --color-scheme-lightness: calc(100% * (    var(--color-scheme)));
+    --char-correct-background:     color-mix(in srgb, #008000 var(--color-scheme-darkness), #00d200 var(--color-scheme-lightness));
+    --char-wrong-place-background: color-mix(in srgb, #a16300 var(--color-scheme-darkness), #db8700 var(--color-scheme-lightness));
+    --char-not-found-background:   color-mix(in srgb, #484848 var(--color-scheme-darkness), #d0d0d0 var(--color-scheme-lightness));
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+
     margin: 0px;
-    height: 100vh;
-    align-content: center;
+    min-height: 100vh;
+}
+
+body > #word-game {
+    flex-grow: 1;
 }
 
 #message {
@@ -26,6 +32,14 @@ body {
     font-size: 10pt;
 }
 
+label[for=dark-mode] {
+    font-size: 10pt;
+}
+
+input[id=dark-mode][type=checkbox] {
+    transform: scale(1);
+}
+
 .keyboard-key-down {
     translate: 0 0.2em;
 }
@@ -34,10 +48,16 @@ body {
     background-color: var(--background-color-dark);
 }
 
+#settings {
+    margin: 1em;
+}
+
 #word-game {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
+    margin: 1em;
 }
 
 .keyboard,
@@ -139,6 +159,14 @@ body {
     .keyboard-key,
     .board-item {
         font-size: 20pt;
+    }
+
+    label[for=dark-mode] {
+        font-size: 20pt;
+    }
+
+    input[id=dark-mode][type=checkbox] {
+        transform: scale(1.5);
     }
 
     .keyboard-char,

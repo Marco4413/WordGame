@@ -6,8 +6,10 @@
     <title>Word Game</title>
 
     <script src="./script.js"></script>
+    <link id="style" rel="stylesheet" href="https://marco4413.github.io/static/css/auto.css">
     <link rel="stylesheet" href="./style.css">
 
+    <script src="https://marco4413.github.io/static/js/theme-toggle.js"></script>
     <script
         src="https://marco4413.github.io/static/js/copyright.js"
         url="https://github.com/Marco4413/WordGame"
@@ -16,6 +18,15 @@
     </script>
 </head>
 <body>
+    <div id="settings">
+        <theme-toggle
+            id="dark-mode"
+            style-id="style"
+            light-href="https://marco4413.github.io/static/css/light.css"
+            dark-href="https://marco4413.github.io/static/css/dark.css"
+            value="Dark Mode ">
+        </theme-toggle>
+    </div>
     <div id="word-game">
         <div id="board"></div>
         <div id="message"></div>
